@@ -107,17 +107,23 @@ let timer;
 let timeLeft = 0;
 let timerRunning = false;
 
-const quote = document.getElementById("quote");
+const quoteEl = document.getElementById("quote");
 const input = document.getElementById("input");
 const timerEl = document.getElementById("timer");
 const wpmEl = document.getElementById("wpm");
 const accuracyEl = document.getElementById("accuracy");
+const progressEl = document.getElementById("progress");
+const feedbackEl = document.getElementById("feedback");
+
+const typeSound = document.getElementById("type-sound");
+const successSound = document.getElementById("success-sound");
 
 function generateQuote() {
   const rand = Math.floor(Math.random() * quotes.length);
   quoteText = quotes[rand];
-  quote.innerText = quoteText;
+  quoteEl.innerText = quoteText;
   input.value = "";
+  progressEl.style.width = "0%";
 }
 
 function startTest() {
@@ -134,10 +140,9 @@ function startTest() {
   timer = setInterval(() => {
     timeLeft--;
     timerEl.innerText = timeLeft;
-
     if (timeLeft <= 0) {
       clearInterval(timer);
-      endTest(false); // Time ended
+      endTest(false);
     }
   }, 1000);
 }
@@ -164,11 +169,14 @@ function endTest(completed = false) {
   accuracyEl.innerText = isNaN(accuracy) ? 0 : accuracy;
 
   if (completed) {
-    timerEl.innerText = `✅ Test Completed in ${actualTime.toFixed(2)}s`;
+    timerEl.innerText = `✅ Done in ${actualTime.toFixed(2)}s`;
+    successSound.play();
+    feedbackEl.innerText = "🔥 Test Completed Successfully!";
   }
 
   timerRunning = false;
 }
+
 function resetTest() {
   clearInterval(timer);
   timerRunning = false;
@@ -178,14 +186,34 @@ function resetTest() {
   accuracyEl.innerText = "0";
   input.value = "";
   input.disabled = true;
-  quote.innerText = "Loading...";
+  feedbackEl.innerText = "💬 Get ready to type!";
+  quoteEl.innerText = "Loading...";
+  progressEl.style.width = "0%";
 }
+
 input.addEventListener("input", () => {
   if (!timerRunning) return;
 
-  const typed = input.value.replace(/\s+/g, " ").trim();
-  const target = quoteText.replace(/\s+/g, " ").trim();
+  const typed = input.value.replace(/\s+/g, " ").trim().toLowerCase();
+  const target = quoteText.replace(/\s+/g, " ").trim().toLowerCase();
 
+  const wordsTyped = typed.split(" ").length;
+  const totalWords = target.split(" ").length;
+  const percent = Math.min((wordsTyped / totalWords) * 100, 100);
+  progressEl.style.width = `${percent}%`;
+
+  // motivational feedback
+  if (percent > 90) feedbackEl.innerText = "🔥 You're almost done!";
+  else if (percent > 60) feedbackEl.innerText = "⚡ Keep going!";
+  else if (percent > 30) feedbackEl.innerText = "💪 Doing great!";
+  else feedbackEl.innerText = "🚀 Let’s go!";
+
+  // typing sound
+  typeSound.currentTime = 0.4;
+  typeSound.play();
+  successSound.volume = 0.6;
+
+  // match and end test
   if (typed === target) {
     clearInterval(timer);
     endTest(true);

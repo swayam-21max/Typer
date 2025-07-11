@@ -1,56 +1,117 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
-  font-family: 'Segoe UI', sans-serif;
-  background: #0f172a;
-  color: white;
+  font-family: 'Outfit', sans-serif;
+  background: linear-gradient(-45deg, #0f172a, #1e293b, #0ea5e9, #0f172a);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  color: #f1f5f9;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  margin: 0;
+  padding: 20px;
+}
+
+@keyframes gradientBG {
+  0% {background-position: 0% 50%;}
+  50% {background-position: 100% 50%;}
+  100% {background-position: 0% 50%;}
 }
 
 .container {
-  text-align: center;
-  width: 90%;
+  background: #1e293b;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 0 20px #38bdf8;
   max-width: 700px;
+  width: 100%;
+  text-align: center;
 }
 
 h1 {
   color: #38bdf8;
+  margin-bottom: 20px;
 }
 
-label, select {
-  font-size: 1rem;
-  margin: 10px;
+.controls {
+  margin-bottom: 15px;
 }
 
-#quote {
+.quote-area {
   font-size: 1.1rem;
-  margin: 20px 0;
+  padding: 15px;
+  background: #334155;
   color: #facc15;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  min-height: 80px;
 }
 
 textarea {
   width: 100%;
   height: 120px;
   font-size: 1rem;
-  padding: 10px;
+  padding: 15px;
   border-radius: 10px;
   border: none;
   outline: none;
   resize: none;
+  background: #0f172a;
+  color: #f1f5f9;
+  box-shadow: inset 0 0 5px #38bdf8;
+}
+
+textarea:disabled {
+  background: #1e293b;
+  color: #94a3b8;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #334155;
+  margin-top: 15px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+#progress {
+  height: 100%;
+  background: #38bdf8;
+  width: 0%;
+  transition: width 0.2s ease;
+}
+
+.feedback {
+  margin-top: 12px;
+  font-size: 1rem;
+  color: #38bdf8;
 }
 
 .info {
   display: flex;
   justify-content: space-around;
-  margin-top: 20px;
-  font-size: 1rem;
+  margin-top: 25px;
   flex-wrap: wrap;
+  gap: 10px;
+}
+
+.info p {
+  background: #334155;
+  padding: 10px 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px #0ea5e9;
 }
 
 button {
-  margin-top: 15px;
+  margin: 10px 8px;
   padding: 10px 20px;
   font-size: 1rem;
   border: none;
@@ -59,4 +120,18 @@ button {
   color: #0f172a;
   font-weight: bold;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  background: #0ea5e9;
+  transform: translateY(-2px);
+}
+
+select {
+  padding: 5px 10px;
+  border-radius: 6px;
+  background: #0f172a;
+  color: #f1f5f9;
+  border: 1px solid #38bdf8;
 }
