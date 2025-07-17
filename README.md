@@ -17,7 +17,7 @@ A **real-time typing speed tester** that helps you improve your speed and accura
 
 ## 🖼️ Demo
 
-> 🔗 swayam-21max.github.io/Typer/  
+> 🔗 (swayam-21max.github.io/Typer)
 
 ---
 
