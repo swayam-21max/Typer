@@ -102,10 +102,16 @@ const quotes = [
   "If you never try, you’ll never know.",
   "Nothing works unless you do."
 ];
+
+
 let quoteText = "";
 let timer;
 let timeLeft = 0;
 let timerRunning = false;
+let correctWords = 0;
+let totalTypedWords = 0;
+let totalTypedChars = 0;
+let totalQuoteWords = 0;
 
 const quoteEl = document.getElementById("quote");
 const input = document.getElementById("input");
@@ -114,7 +120,6 @@ const wpmEl = document.getElementById("wpm");
 const accuracyEl = document.getElementById("accuracy");
 const progressEl = document.getElementById("progress");
 const feedbackEl = document.getElementById("feedback");
-
 const typeSound = document.getElementById("type-sound");
 const successSound = document.getElementById("success-sound");
 
@@ -129,6 +134,7 @@ function generateQuote() {
 function startTest() {
   if (timerRunning) return;
 
+  resetStats();
   const mode = parseInt(document.getElementById("mode").value);
   timeLeft = mode;
   timerEl.innerText = timeLeft;
@@ -142,80 +148,72 @@ function startTest() {
     timerEl.innerText = timeLeft;
     if (timeLeft <= 0) {
       clearInterval(timer);
-      endTest(false);
+      endTest();
     }
   }, 1000);
 }
 
-function endTest(completed = false) {
+function endTest() {
   input.disabled = true;
-  const typed = input.value.trim();
-  const typedWords = typed.split(/\s+/).filter(w => w !== "");
-  const quoteWords = quoteText.trim().split(/\s+/);
-
-  let correctWords = 0;
-  for (let i = 0; i < typedWords.length; i++) {
-    if (typedWords[i] === quoteWords[i]) correctWords++;
-  }
-
-  const totalTime = parseInt(document.getElementById("mode").value);
-  const actualTime = totalTime - timeLeft;
-  const minutes = actualTime > 0 ? actualTime / 60 : 1;
-
-  const wpm = Math.round((correctWords / minutes));
-  const accuracy = Math.round((correctWords / quoteWords.length) * 100);
+  const wpm = Math.round((correctWords / (parseInt(document.getElementById("mode").value) / 60)));
+  const accuracy = totalTypedWords === 0 ? 0 : Math.round((correctWords / totalTypedWords) * 100);
 
   wpmEl.innerText = isNaN(wpm) ? 0 : wpm;
   accuracyEl.innerText = isNaN(accuracy) ? 0 : accuracy;
-
-  if (completed) {
-    timerEl.innerText = `✅ Done in ${actualTime.toFixed(2)}s`;
-    successSound.play();
-    feedbackEl.innerText = "🔥 Test Completed Successfully!";
-  }
-
+  feedbackEl.innerText = "⏰ Time's up!";
+  successSound.play();
   timerRunning = false;
 }
 
-function resetTest() {
+function resetStats() {
   clearInterval(timer);
   timerRunning = false;
   timeLeft = 0;
+  correctWords = 0;
+  totalTypedWords = 0;
+  totalTypedChars = 0;
+  totalQuoteWords = 0;
+
   timerEl.innerText = "--";
   wpmEl.innerText = "0";
   accuracyEl.innerText = "0";
   input.value = "";
   input.disabled = true;
   feedbackEl.innerText = "💬 Get ready to type!";
-  quoteEl.innerText = "Loading...";
+  quoteEl.innerText = "Loading quote...";
   progressEl.style.width = "0%";
+}
+
+function resetTest() {
+  resetStats();
 }
 
 input.addEventListener("input", () => {
   if (!timerRunning) return;
 
-  const typed = input.value.replace(/\s+/g, " ").trim().toLowerCase();
-  const target = quoteText.replace(/\s+/g, " ").trim().toLowerCase();
+  const typed = input.value.trim();
+  const typedWords = typed.split(/\s+/);
+  const targetWords = quoteText.trim().split(/\s+/);
 
-  const wordsTyped = typed.split(" ").length;
-  const totalWords = target.split(" ").length;
-  const percent = Math.min((wordsTyped / totalWords) * 100, 100);
+  totalTypedWords += typedWords.length;
+  totalQuoteWords += targetWords.length;
+
+  const percent = Math.min((typedWords.length / targetWords.length) * 100, 100);
   progressEl.style.width = `${percent}%`;
 
-  // motivational feedback
+  // Feedback
   if (percent > 90) feedbackEl.innerText = "🔥 You're almost done!";
   else if (percent > 60) feedbackEl.innerText = "⚡ Keep going!";
   else if (percent > 30) feedbackEl.innerText = "💪 Doing great!";
   else feedbackEl.innerText = "🚀 Let’s go!";
 
-  // typing sound
   typeSound.currentTime = 0.4;
   typeSound.play();
   successSound.volume = 0.6;
 
-  // match and end test
-  if (typed === target) {
-    clearInterval(timer);
-    endTest(true);
+  // If fully typed & matches
+  if (typed === quoteText) {
+    correctWords += typedWords.length;
+    generateQuote();
   }
 });
